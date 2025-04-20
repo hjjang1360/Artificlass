@@ -19,9 +19,9 @@ from sklearn.model_selection import train_test_split
 
 # Directories for JSON logs
 # LOG_DIR = "./logs"
-LOG_DIR = "/home/work/workspace_ai/Artificlass/logs/trip"
+LOG_DIR = "/home/work/workspace_ai/Artificlass/logs/double"
 # LOG_DIR="../logs"
-BEST_MODEL_DIR = "/home/work/workspace_ai/Artificlass/weights/trip"
+BEST_MODEL_DIR = "/home/work/workspace_ai/Artificlass/weights/double"
 # BEST_MODEL_DIR="../weights/trip"
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(BEST_MODEL_DIR, exist_ok=True)
@@ -32,37 +32,23 @@ class CNN_trip(nn.Module):
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
         self.conv4 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv2d(256, 512, kernel_size=3, padding=1)
-        self.conv6 = nn.Conv2d(512, 1024, kernel_size=3, padding=1)
         self.pool = nn.MaxPool2d(2, 2, padding=0)
         self.dropout = nn.Dropout(p=0.2)
-        self.fc1 = nn.Linear(1024 * 16 * 16, 1024)  # Updated input size
-        self.fc2 = nn.Linear(1024, 512)
-        self.fc3 = nn.Linear(512, 128)
-        self.fc4 = nn.Linear(128, 51)
-
+        self.fc1 = nn.Linear(256 * 64 * 64, 512)
+        self.fc2 = nn.Linear(512, 128)
+        self.fc3 = nn.Linear(128, 51)
     def forward(self, x):
-        x = self.conv2(self.conv1(x))
-        x = self.pool(F.relu(x))
-        x = self.dropout(x)
-        x = self.conv4(self.conv3(x))
-        x = self.pool(F.relu(x))
-        x = self.dropout(x)
-        # x= self.conv6(self.conv5(x))
-        x=self.pool(F.relu(self.conv5(x)))
-        x = self.dropout(x)
-        x= self.conv6(x)
-        x = self.pool(F.relu(x))
-        x = self.dropout(x)
-        # print(x.shape)
-        x = x.view(x.size(0), -1)
-        x = F.relu(self.fc1(x))
-        x= self.dropout(x)
-        x = F.relu(self.fc2(x))
-        x = self.dropout(x)
-        x = F.relu(self.fc3(x))
-        x = self.dropout(x)
-        x = self.fc4(x)
+        x=self.conv2(self.conv1(x))
+        x=self.pool(F.relu(x))
+        x=self.dropout(x)
+        x=self.conv4(self.conv3(x))
+        x=self.pool(F.relu(x))
+        x=self.dropout(x)
+        x=x.view(x.size(0), -1)
+        x=F.relu(self.fc1(x))
+        # x=self.dropout(x)
+        x=F.relu(self.fc2(x))
+        x=self.fc3(x)
         return x
     
 

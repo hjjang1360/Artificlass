@@ -10,5 +10,7 @@ mkdir -p "${LOG_DIR}"
 nohup python ./tripCNN.py > "${LOG_DIR}/tripCNN.log" 2>&1 &
 wait  # Wait for both to finish
 
+nohup python ./doubleCNN.py > "${LOG_DIR}/doubleCNN.log" 2>&1 &
+wait  # Wait for both to finish
 
 echo "All scripts have finished."
