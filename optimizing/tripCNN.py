@@ -126,6 +126,7 @@ def objective(trial):
     style_mapper = StyleLabelMapper(style_encoder)
     title_mapper = StyleLabelMapper(title_encoder)
     artist_mapper = StyleLabelMapper(artist_encoder)
+    
     num_sample=1000
     
     style_name_encoded = style_encoder.fit_transform(style_name[:num_sample])

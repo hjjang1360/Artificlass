@@ -1,0 +1,14 @@
+#!/bin/bash
+# This script runs six Python files in groups of two concurrently.
+# The use of nohup ensures the processes keep running even after terminal logout.
+
+# Create a directory for log files if it doesn't exist
+LOG_DIR="./output_log"
+mkdir -p "${LOG_DIR}"
+
+# Group 1: Run cifar10_doubleCNN.py concurrently
+nohup python ./tripCNN.py > "${LOG_DIR}/tripCNN.log" 2>&1 &
+wait  # Wait for both to finish
+
+
+echo "All scripts have finished."
