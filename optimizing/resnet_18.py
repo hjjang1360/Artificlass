@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torchvision import datasets, transforms
+from torchvision import models
 from torch.utils.data import DataLoader, random_split
 import tqdm
 import optuna
@@ -14,43 +15,25 @@ import torchvision.io as io
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-
+from PIL import Image
 
 
 # Directories for JSON logs
 # LOG_DIR = "./logs"
-LOG_DIR = "/home/work/workspace_ai/Artificlass/logs/double"
+LOG_DIR = "/home/work/workspace_ai/Artificlass/logs/resnet_18"
 # LOG_DIR="../logs"
-BEST_MODEL_DIR = "/home/work/workspace_ai/Artificlass/weights/double"
+BEST_MODEL_DIR = "/home/work/workspace_ai/Artificlass/weights/resnet_18"
 # BEST_MODEL_DIR="../weights/trip"
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(BEST_MODEL_DIR, exist_ok=True)
-class CNN_trip(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
-        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
-        self.pool = nn.MaxPool2d(2, 2, padding=0)
-        self.dropout = nn.Dropout(p=0.2)
-        self.fc1 = nn.Linear(256 * 64 * 64, 512)
-        self.fc2 = nn.Linear(512, 128)
-        self.fc3 = nn.Linear(128, 73)
-    def forward(self, x):
-        x=self.conv2(self.conv1(x))
-        x=self.pool(F.relu(x))
-        x=self.dropout(x)
-        x=self.conv4(self.conv3(x))
-        x=self.pool(F.relu(x))
-        x=self.dropout(x)
-        x=x.view(x.size(0), -1)
-        x=F.relu(self.fc1(x))
-        # x=self.dropout(x)
-        x=F.relu(self.fc2(x))
-        x=self.fc3(x)
-        return x
-    
+
+def get_resnet18(num_classes: int, pretrained: bool = True):
+    # 1. Load the backbone
+    model = models.resnet18(pretrained=pretrained)
+    # 2. Replace its final FC layer
+    in_features = model.fc.in_features
+    model.fc = nn.Linear(in_features, num_classes)
+    return model
 
 class StyleLabelMapper:
     def __init__(self, label_encoder):
@@ -74,7 +57,7 @@ def objective(trial):
 
     # Set device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = CNN_trip().to(device)
+    model = get_resnet18(num_classes=73, pretrained=True).to(device)
 
     # Select optimizer
     if optimizer_name == 'SGD':
@@ -91,12 +74,25 @@ def objective(trial):
     criterion = nn.CrossEntropyLoss()
 
     # Data transforms for training and testing
-    transform=transforms.Compose([
-    transforms.Resize((256,256)),
-    # transforms.ToTensor(),
-    transforms.Lambda(lambda x: x/ 255.0),
-    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+    # transform=transforms.Compose([
+    # transforms.Resize((256,256)),
+    # # transforms.ToTensor(),
+    # transforms.Lambda(lambda x: x/ 255.0),
+    # transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+    # ])
+    
+    # normalization from imagenet 
+    transform = transforms.Compose([
+        transforms.Resize((256,256)),
+        transforms.CenterCrop((224,224)),
+        transforms.ToTensor(),                             # <-- important: first convert to [0,1]
+        # transforms.Lambda(lambda x: x/ 255.0),
+        transforms.Normalize(                             
+            mean=[0.485, 0.456, 0.406],                    # ImageNet mean
+            std=[0.229, 0.224, 0.225],                     # ImageNet std
+        ),
     ])
+
     
     ######## DATA LOADING ########
     path_to_data ='/home/work/workspace_ai/Artificlass/data_process/data/'
@@ -123,9 +119,10 @@ def objective(trial):
     ####### Making image dataset #######
     img_all = torch.empty((0, 3, 256, 256)).to(device)
     for i in range(len(image_path[:num_sample])):
-        img_tmp = io.read_image(image_path[i])
+        # img_tmp = io.read_image(image_path[i])
+        pil_img = Image.open(image_path[i]).convert("RGB")
         # Apply the transform to the image
-        img_tmp = transform(img_tmp)
+        img_tmp = transform(pil_img)
         img_all=torch.cat((img_all, img_tmp.unsqueeze(0)), 0) if i > 0 else img_tmp.unsqueeze(0)
     
     # Split the dataset into training and test sets

@@ -39,7 +39,7 @@ class CNN_trip(nn.Module):
         self.fc1 = nn.Linear(1024 * 16 * 16, 1024)  # Updated input size
         self.fc2 = nn.Linear(1024, 512)
         self.fc3 = nn.Linear(512, 128)
-        self.fc4 = nn.Linear(128, 51)
+        self.fc4 = nn.Linear(128, 73)
 
     def forward(self, x):
         x = self.conv2(self.conv1(x))
@@ -128,7 +128,7 @@ def objective(trial):
     title_mapper = StyleLabelMapper(title_encoder)
     artist_mapper = StyleLabelMapper(artist_encoder)
     
-    num_sample=1000
+    num_sample=3000
     
     style_name_encoded = style_encoder.fit_transform(style_name[:num_sample])
     title_encoded = title_encoder.fit_transform(title[:num_sample])
