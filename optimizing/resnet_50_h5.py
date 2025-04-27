@@ -17,12 +17,13 @@ style_list = [
     'Romanticism',
     'Expressionism',
     'Post-Impressionism',
-    'Art Nouveau (Modern)'
+    'Art Nouveau (Modern)',
+    'Baroque'                # If top 7
 ]
 style2idx = {s: i for i, s in enumerate(style_list)}
 
 # 2) HDF5 전체 로드
-h5_path = '/home/work/workspace_ai/Artificlass/data_process/data/top6_h5_merged.h5'
+h5_path = '/home/work/workspace_ai/Artificlass/data_process/data/top7_h5_merged.h5'
 with h5py.File(h5_path, 'r') as f:
     # (N, 3, 256, 256) uint8 → float32 [0,1]
     imgs_np = f['images'][:] .astype(np.float32) / 255.0
@@ -45,7 +46,19 @@ normalize = transforms.Normalize(
     mean=[0.485, 0.456, 0.406],
     std =[0.229, 0.224, 0.225]
 )
+# transform=transforms.Compose([
+#         transforms.RandomCrop(32,padding=4),
+#         transforms.RandomHorizontalFlip(),
+#         # transforms.ToTensor(),
+#         transforms.Normalize(
+#         mean=[0.485, 0.456, 0.406],
+#         std =[0.229, 0.224, 0.225]) # ImageNet의 avg, std. https://pytorch.org/vision/stable/models.html
+#         # transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
+#     ])
 imgs = normalize(imgs)
+# imgs= transform(imgs)
+    # 메모리 정리
+    
 
 # 5) Dataset → train/val/test 분할
 full_ds = TensorDataset(imgs, labels)
@@ -75,11 +88,41 @@ test_loader  = DataLoader(test_ds,  shuffle=False, **loader_kwargs)
 
 # 7) 모델·옵티마이저·손실함수 설정
 device    = 'cuda'
-model     = models.resnet50(pretrained=False)
-model.fc  = nn.Linear(model.fc.in_features, len(style2idx))
+class resnet50_add(nn.Module):
+    def __init__(self, num_classes):
+        super(resnet50_add, self).__init__()
+        backbone = models.resnet50(pretrained=False)
+        in_feats = backbone.fc.in_features
+        backbone.fc = nn.Identity()
+        self.backbone = backbone
+        
+        self.drop  = nn.Dropout(p=0.2)
+        self.fc1   = nn.Linear(in_feats, 1024)
+        self.relu  = nn.ReLU()
+        self.fc2   = nn.Linear(1024, num_classes)
+        # self.resnet.fc = nn.Linear(self.resnet.fc.in_features, len(style2idx))
+        
+
+    def forward(self, x):
+        # return self.resnet(x)
+        # x= self.resnet(x)
+        # x=self.delete(x)
+        # x = self.drop(x)
+        # x = self.fc1(x)
+        # x = self.fc2(self.drop(x))
+        x = self.backbone(x)           # → (batch, 2048)
+        x = self.drop(x)
+        x = self.relu(self.fc1(x))     # → (batch, 1024)
+        x = self.drop(x)
+        x = self.fc2(x)
+        return x
+    
+# model     = models.resnet50(pretrained=False)
+# model.fc  = nn.Linear(model.fc.in_features, len(style2idx))
+model=resnet50_add(num_classes=len(style2idx))
 model.to(device)
 
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
+optimizer = optim.NAdam(model.parameters(), lr=1e-4)
 criterion = nn.CrossEntropyLoss()
 
 # 8) 학습 + 검증 루프 (최저 val_loss 시 저장)
@@ -90,14 +133,19 @@ print(f">> Starting training for {num_epochs} epochs", flush=True)
 for epoch in range(1, num_epochs+1):
     # — Training —
     model.train()
+    train_loss= total=0
     for imgs_b, lbls_b in tqdm(train_loader,
                                 desc=f"[Epoch {epoch}/{num_epochs}] train",
                                 ncols=80):
         imgs_b, lbls_b = imgs_b.to(device), lbls_b.to(device)
         optimizer.zero_grad()
         loss = criterion(model(imgs_b), lbls_b)
+        total += lbls_b.size(0)
+        train_loss += loss.item() * lbls_b.size(0)
         loss.backward()
         optimizer.step()
+    train_loss /= total
+    print(f"[Epoch {epoch}/{num_epochs}] train_loss: {train_loss:.4f}", end=' ')
 
     # — Validation —
     model.eval()
@@ -124,5 +172,5 @@ for epoch in range(1, num_epochs+1):
 
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-        torch.save(model.state_dict(), 'best_model_under_h5.pth')
+        torch.save(model.state_dict(), 'best_model_under_h5_top7.pth')
         print(f"▶ New best model saved (val_loss={best_val_loss:.4f})\n")

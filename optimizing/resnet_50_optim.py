@@ -22,9 +22,9 @@ import time
 
 # Directories for JSON logs
 # LOG_DIR = "./logs"
-LOG_DIR = "/home/work/workspace_ai/Artificlass/logs/resnet18_added1"
+LOG_DIR = "/home/work/workspace_ai/Artificlass/logs/resnet50_added1"
 # LOG_DIR="../logs"
-BEST_MODEL_DIR = "/home/work/workspace_ai/Artificlass/weights/resnet18_added1"
+BEST_MODEL_DIR = "/home/work/workspace_ai/Artificlass/weights/resnet50_added1"
 # BEST_MODEL_DIR="../weights/trip"
 os.makedirs(LOG_DIR, exist_ok=True)
 os.makedirs(BEST_MODEL_DIR, exist_ok=True)
@@ -59,7 +59,7 @@ class resnet50_add(nn.Module):
     def __init__(self, num_classes=7, dropout_rates=(0.5, 0.4, 0.3, 0.2)):
         super().__init__()
         # 1) backbone: ResNet50 up to the final pooling
-        self.backbone = models.resnet18(pretrained=False)
+        self.backbone = models.resnet50(pretrained=False)
         # remove the default fc
         self.backbone.fc = nn.Identity()
         
@@ -68,7 +68,7 @@ class resnet50_add(nn.Module):
         
         # 3) classifier head
         layers = []
-        in_features = 512
+        in_features = 2048
         hidden_sizes = [1024, 512, 256, 128]
         
         for i, out_features in enumerate(hidden_sizes):
