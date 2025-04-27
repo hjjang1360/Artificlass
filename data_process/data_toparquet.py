@@ -162,6 +162,7 @@ from multiprocessing import Process, Queue
 import os
 import math
 from collections import Counter
+import gc
 
 current_path = '/home/work/workspace_ai/Artificlass/data_process'
 
