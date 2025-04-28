@@ -50,7 +50,7 @@ seed = 42
 # ─────────────────────────────────────────────────────────────
 # 2) ImageFolder 로더 + 클래스→인덱스 매핑
 # ─────────────────────────────────────────────────────────────
-data_root = '/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_4'
+data_root = '/home/work/workspace_ai/Artificlass/data_process/data/augmented_images'
 full_dataset = datasets.ImageFolder(root=data_root, transform=None)
 # train_ds = ImageFolder(root=data_root, transform=train_transform)
 # val_ds   = ImageFolder(root=data_root, transform=val_transform)
