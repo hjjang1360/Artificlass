@@ -367,11 +367,11 @@ def run_optuna(n_trials=48):
     best_trial = study.best_trial
     print("  Best trial:")
     # print("    Value (Best Validation Loss): {:.4f}".format(best_trial.value))
-    print(f"  Best trial #{best.number} — test_accuracy: {best.value:.4f}%")
+    print(f"  Best trial #{best_trial.number} — test_accuracy: {best_trial.value:.4f}%")
     print("    Params:")
     # for key, value in best_trial.params.items():
     #     print("      {}: {}".format(key, value))
-    for k, v in best.params.items():
+    for k, v in best_trial.params.items():
         print(f"    {k}: {v}")
 
     # Load the best trial's metrics and save the best trial log as before...
