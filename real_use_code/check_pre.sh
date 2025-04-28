@@ -9,4 +9,8 @@ while kill -0 "$pid" 2>/dev/null; do
 done
 
 echo "Process $pid has exited."
-bash next_pre.sh
+# bash next_pre.sh
+nohup ./next_pre.sh > next_pre.log 2>&1 &
+
+wait # Wait for the next_pre.sh process to finish
+echo "next_pre.sh has finished."
