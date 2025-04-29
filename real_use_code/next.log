@@ -1,0 +1,2 @@
+./next.sh: line 19: unexpected EOF while looking for matching `"'
+./next.sh: line 20: syntax error: unexpected end of file

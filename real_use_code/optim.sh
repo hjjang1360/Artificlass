@@ -14,7 +14,7 @@ mkdir -p "${LOG_DIR}"
 # wait  # Wait for both to finish
 
 # nohup python ./resnet_18.py > "${LOG_DIR}/resnet_18.log" 2>&1 &
-wait  # Wait for both to finish
+# wait  # Wait for both to finish
 nohup python ./jpg_resnet50_pre.py > "${LOG_DIR}/jpg_resnet50_pre.log" 2>&1 &
 wait  # Wait for both to finish
 

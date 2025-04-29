@@ -36,9 +36,36 @@ seed = 42
 
 # ─────────────────────────────────────────────────────────────
 # 2) ImageFolder 로더 + train/val/test 분할
-# ─────────────────────────────────────────────────────────────
+# # ─────────────────────────────────────────────────────────────
+# data_root = '/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_4'
+# full_ds = datasets.ImageFolder(root=data_root, transform=None)
+# style2idx = full_ds.class_to_idx.copy()
+# num_classes = len(style2idx)
+
+# # 랜덤 인덱스 섞기
+# n = len(full_ds)
+# indices = np.arange(n)
+# np.random.seed(seed)
+# np.random.shuffle(indices)
+# n_train = int(0.8 * n)
+# n_val   = int(0.1 * n)
+# train_idx = indices[:n_train]
+# val_idx   = indices[n_train:n_train+n_val]
+# test_idx  = indices[n_train+n_val:]
+
+# # Subset & DataLoader
+# train_ds = Subset(datasets.ImageFolder(root=data_root, transform=train_transform),
+#                   train_idx)
+# val_ds   = Subset(datasets.ImageFolder(root=data_root, transform=val_transform),
+#                   val_idx)
+# test_ds  = Subset(datasets.ImageFolder(root=data_root, transform=val_transform),
+#                   test_idx)
+
+
 data_root = '/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_4'
-full_ds = datasets.ImageFolder(root=data_root, transform=None)
+# data_root ='/home/hjjang/Artificlass/data_process/data/augmented_images_4'
+train_root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/train'
+full_ds = datasets.ImageFolder(root=train_root, transform=None)
 style2idx = full_ds.class_to_idx.copy()
 num_classes = len(style2idx)
 
@@ -47,19 +74,19 @@ n = len(full_ds)
 indices = np.arange(n)
 np.random.seed(seed)
 np.random.shuffle(indices)
-n_train = int(0.8 * n)
-n_val   = int(0.1 * n)
+# n_train = int(0.8 * n)
+n_train=int(n)
+
+# n_val   = int(0.1 * n)
+n_val=int(len(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/val', transform=None)))
 train_idx = indices[:n_train]
-val_idx   = indices[n_train:n_train+n_val]
+val_idx   = indices[:n_val]
 test_idx  = indices[n_train+n_val:]
 
 # Subset & DataLoader
-train_ds = Subset(datasets.ImageFolder(root=data_root, transform=train_transform),
-                  train_idx)
-val_ds   = Subset(datasets.ImageFolder(root=data_root, transform=val_transform),
-                  val_idx)
-test_ds  = Subset(datasets.ImageFolder(root=data_root, transform=val_transform),
-                  test_idx)
+train_ds = Subset(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/train', transform=train_transform), train_idx)
+val_ds   = Subset(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/val', transform=val_transform), val_idx)
+test_ds  = Subset(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/test', transform=val_transform), val_idx)
 
 loader_kwargs = dict(
     batch_size=16,
@@ -177,7 +204,7 @@ for epoch in range(1, num_epochs+1):
         best_val_loss = val_loss
         no_improve_epochs = 0
         # 최적 모델 저장
-        torch.save(model.state_dict(), 'best_model_from_folder_pre_4.pth')
+        torch.save(model.state_dict(), 'best_model_from_folder_pre_4_fixed.pth')
         print(f"→ New best model saved (val_loss={best_val_loss:.4f})\n")
     else:
         no_improve_epochs += 1
@@ -193,4 +220,4 @@ for epoch in range(1, num_epochs+1):
 with open('training_metrics_4.json', 'w') as fp:
     json.dump(metrics, fp, indent=2)
 
-print("✅ Done. Metrics saved to training_metrics_pre_4.json")
+print("✅ Done. Metrics saved to training_metrics_pre_4_fixed.json")

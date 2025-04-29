@@ -1,0 +1,5 @@
+/opt/conda/lib/python3.8/site-packages/pandas/compat/_optional.py:161: UserWarning: Pandas requires version '2.7.1' or newer of 'numexpr' (version '2.7.0' currently installed).
+  warnings.warn(msg, UserWarning)
+[I 2025-04-21 06:05:51,245] A new study created in memory with name: no-name-a68db409-7875-43d1-b757-87913a1fe1bb
+Trial 0 - Batch Size: 64, Optimizer: Adam, Learning Rate: 0.1, Epochs: 100, Patience: 10
+Trial 0 Epoch 1/100 - Training:   0%|          | 0/75 [00:00<?, ?it/s]Trial 0 Epoch 1/100 - Training:   1%|▏         | 1/75 [00:02<03:02,  2.46s/it]Trial 0 Epoch 1/100 - Training:   8%|▊         | 6/75 [00:02<00:22,  3.10it/s]Trial 0 Epoch 1/100 - Training:  15%|█▍        | 11/75 [00:02<00:09,  6.44it/s]

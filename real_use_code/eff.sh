@@ -10,7 +10,7 @@ mkdir -p "${LOG_DIR}"
 
 # nohup python ./resnet_18.py > "${LOG_DIR}/resnet_18.log" 2>&1 &
 # wait  # Wait for both to finish
-nohup python ./EfficientNet_fre.py > "${LOG_DIR}/EfficientNet_fre.log" 2>&1 &
+nohup python ./EfficientNet.py > "${LOG_DIR}/EfficientNet.log" 2>&1 &
 wait  # Wait for both to finish
 
 echo "All scripts have finished."
