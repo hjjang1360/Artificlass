@@ -1,0 +1,29 @@
+{
+    "trial": [
+        25
+    ],
+    "batch_size": [
+        32
+    ],
+    "optimizer": [
+        "SGD"
+    ],
+    "learning rate": [
+        0.01
+    ],
+    "patience": [
+        10
+    ],
+    "epochs": [
+        1
+    ],
+    "train_loss": [
+        3.731074275970459
+    ],
+    "val_loss": [
+        3.3518057346343992
+    ],
+    "test_accuracy": [
+        5.666666666666667
+    ]
+}

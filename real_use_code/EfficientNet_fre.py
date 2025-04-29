@@ -114,8 +114,8 @@ best_val_loss      = float('inf')
 no_improve_epochs  = 0
 early_stop_patience = 5   # 개선 없으면 5 에폭 만에 중단
 
-total_epochs       = 25
-freeze_after_epoch = 5
+total_epochs       = 50
+freeze_after_epoch = 10
 
 for epoch in range(1, total_epochs+1):
     start_time = time.time()

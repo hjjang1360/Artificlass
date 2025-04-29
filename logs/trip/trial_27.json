@@ -1,0 +1,29 @@
+{
+    "trial": [
+        27
+    ],
+    "batch_size": [
+        64
+    ],
+    "optimizer": [
+        "Adam"
+    ],
+    "learning rate": [
+        0.01
+    ],
+    "patience": [
+        10
+    ],
+    "epochs": [
+        1
+    ],
+    "train_loss": [
+        1847.7003407510122
+    ],
+    "val_loss": [
+        3.264674186706543
+    ],
+    "test_accuracy": [
+        10.0
+    ]
+}

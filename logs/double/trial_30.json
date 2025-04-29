@@ -1,0 +1,29 @@
+{
+    "trial": [
+        30
+    ],
+    "batch_size": [
+        128
+    ],
+    "optimizer": [
+        "Adamax"
+    ],
+    "learning rate": [
+        0.0001
+    ],
+    "patience": [
+        10
+    ],
+    "epochs": [
+        1
+    ],
+    "train_loss": [
+        3.302724542617798
+    ],
+    "val_loss": [
+        3.169368839263916
+    ],
+    "test_accuracy": [
+        20.333333333333332
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "trial": [
+        9
+    ],
+    "batch_size": [
+        32
+    ],
+    "optimizer": [
+        "RMSprop"
+    ],
+    "learning rate": [
+        0.01
+    ],
+    "patience": [
+        10
+    ],
+    "epochs": [
+        1
+    ],
+    "train_loss": [
+        113809062.40838479
+    ],
+    "val_loss": [
+        3.3542367696762083
+    ],
+    "test_accuracy": [
+        7.666666666666667
+    ]
+}
