@@ -47,13 +47,14 @@ val_df   = pd.concat(splits_data['val']).sample(frac=1, random_state=42).reset_i
 test_df  = pd.concat(splits_data['test']).sample(frac=1, random_state=42).reset_index(drop=True)
 
 # 3) 저장 경로 초기화
-base_dir = "/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split"
+base_dir = "/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split_v3"
 if os.path.exists(base_dir):
     shutil.rmtree(base_dir)
 os.makedirs(base_dir, exist_ok=True)
 
 # 4) 증강 파이프라인 (모든 split에 적용)
 augment = transforms.Compose([
+    transforms.Resize((1024, 1024)),
     transforms.RandomRotation(20),
     transforms.RandomAffine(
         degrees=0,
@@ -84,10 +85,18 @@ for split_name, split_df in [('train', train_df),
 
         # 원본
         img.save(os.path.join(dst_dir, f"{prefix}_orig.jpg"), quality=95)
-        # 증강 3장
-        for i in range(1, 4):
-            aug = augment(img)
-            aug.save(os.path.join(dst_dir, f"{prefix}_aug{i}.jpg"), quality=95)
+        if split_name == 'train':
+            # 증강 3장
+            for i in range(1, 3):
+                aug = augment(img)
+                aug.save(os.path.join(dst_dir, f"{prefix}_aug{i}.jpg"), quality=95)
+        else:
+            continue
         cnt_img+=1
+        # 증강 3장
+        # for i in range(1, 4):
+        #     aug = augment(img)
+        #     aug.save(os.path.join(dst_dir, f"{prefix}_aug{i}.jpg"), quality=95)
+        # cnt_img+=1
 print(cnt_img)
 print("All done!")

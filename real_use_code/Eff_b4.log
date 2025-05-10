@@ -1,0 +1,27 @@
+nohup: ignoring input
+/opt/conda/lib/python3.8/site-packages/apex/pyprof/__init__.py:5: FutureWarning: pyprof will be removed by the end of June, 2022
+  warnings.warn("pyprof will be removed by the end of June, 2022", FutureWarning)
+Traceback (most recent call last):
+  File "Eff_b4.py", line 140, in <module>
+    main()
+  File "Eff_b4.py", line 93, in main
+    model = StyleClassifier('efficientnet_b4', num_classes=num_classes, dropout=0.3).to(device)
+  File "Eff_b4.py", line 44, in __init__
+    self.backbone = timm.create_model(model_name, pretrained=True, num_classes=num_classes, drop_rate=dropout)
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/_factory.py", line 126, in create_model
+    model = create_fn(
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/efficientnet.py", line 2013, in efficientnet_b4
+    model = _gen_efficientnet(
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/efficientnet.py", line 673, in _gen_efficientnet
+    model = _create_effnet(variant, pretrained, **model_kwargs)
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/efficientnet.py", line 374, in _create_effnet
+    model = build_model_with_cfg(
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/_builder.py", line 436, in build_model_with_cfg
+    load_pretrained(
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/_builder.py", line 163, in load_pretrained
+    load_from, pretrained_loc = _resolve_pretrained_source(pretrained_cfg)
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/_builder.py", line 64, in _resolve_pretrained_source
+    if not old_cache_valid and hf_hub_id and has_hf_hub(necessary=True):
+  File "/home/work/.local/lib/python3.8/site-packages/timm/models/_hub.py", line 126, in has_hf_hub
+    raise RuntimeError(
+RuntimeError: Hugging Face hub model specified but package not installed. Run `pip install huggingface_hub`.

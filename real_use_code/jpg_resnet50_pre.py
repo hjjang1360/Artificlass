@@ -48,64 +48,84 @@ val_transform = transforms.Compose([
 seed = 42
 
 # ─────────────────────────────────────────────────────────────
-# 2) ImageFolder 로더 + 클래스→인덱스 매핑
-# ─────────────────────────────────────────────────────────────
-data_root = '/home/work/workspace_ai/Artificlass/data_process/data/augmented_images'
-full_dataset = datasets.ImageFolder(root=data_root, transform=None)
-# train_ds = ImageFolder(root=data_root, transform=train_transform)
-# val_ds   = ImageFolder(root=data_root, transform=val_transform)
-style2idx   = full_dataset.class_to_idx.copy()
-num_classes = len(style2idx)
-print(f"Classes ({num_classes}): {style2idx}")
+# 2) ImageFolder 로더 + train/val/test 분할
+# # ─────────────────────────────────────────────────────────────
+# data_root = '/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_4'
+# # data_root ='/home/hjjang/Artificlass/data_process/data/augmented_images_4'
+train_root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split_3_aug/train'
+val_root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split_3_aug/val'
+test_root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split_3_aug/test'
+# full_ds = datasets.ImageFolder(root=train_root, transform=None)
+# val_full=datasets.ImageFolder(root=val_root, transform=None)
+# style2idx = full_ds.class_to_idx.copy()
+# num_classes = len(style2idx)
+num_classes=7
 
-# ─────────────────────────────────────────────────────────────
-# 3) train / val / test 분할
-# ─────────────────────────────────────────────────────────────
-n = len(full_dataset)
-# n_train = int(0.8 * n)
-# n_val   = int(0.1 * n)
-# n_test  = n - n_train - n_val
+# # 랜덤 인덱스 섞기
+# n = len(full_ds)
+# indices = np.arange(n)
+# np.random.seed(seed)
+# np.random.shuffle(indices)
+# # n_train = int(0.8 * n)
+# n_train=int(n)
 
-# train_ds, val_ds, test_ds = random_split(
-#     full_dataset,
-#     [n_train, n_val, n_test],
-#     generator=torch.Generator().manual_seed(42)
+
+# # n_val   = int(0.1 * n)
+# # n_val=int(len(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/val', transform=None)))
+# n_val=len(val_full)
+# indices_v=np.arange(n_val)
+# np.random.seed(seed)
+# np.random.shuffle(indices_v)
+
+# train_idx = indices[:n_train]
+# val_idx   = indices_v[:n_val]
+# test_idx  = indices_v[:n_val]
+
+# # Subset & DataLoader
+# train_ds = Subset(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/train', transform=train_transform), train_idx)
+# val_ds   = Subset(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/val', transform=val_transform), val_idx)
+# test_ds  = Subset(datasets.ImageFolder(root='/home/work/workspace_ai/Artificlass/data_process/data/augmented_images_split/test', transform=val_transform), val_idx)
+
+# loader_kwargs = dict(
+#     batch_size=16,
+#     num_workers=4,
+#     pin_memory=True,
+#     prefetch_factor=2,
+#     persistent_workers=True
 # )
+# train_loader = DataLoader(train_ds, shuffle=True,  **loader_kwargs)
+# val_loader   = DataLoader(val_ds,   shuffle=False, **loader_kwargs)
+# test_loader  = DataLoader(test_ds,  shuffle=False, **loader_kwargs)
 
-# 3) 인덱스 섞기 + 분할
-indices = np.arange(n)
-np.random.seed(seed)
-np.random.shuffle(indices)
+train_ds = datasets.ImageFolder(root=train_root, transform=val_transform)
+val_ds   = datasets.ImageFolder(root=val_root,   transform=val_transform)
+test_ds  = datasets.ImageFolder(root=test_root,  transform=val_transform)
 
-n_train = int(0.8 * n)
-n_val   = int(0.1 * n)
-train_idx = indices[:n_train]
-val_idx   = indices[n_train:n_train+n_val]
-test_idx  = indices[n_train+n_val:]
-
-# 4) Subset으로 train/val/test 생성
-train_ds = Subset(datasets.ImageFolder(root=data_root, transform=train_transform),
-                  train_idx)
-val_ds   = Subset(datasets.ImageFolder(root=data_root, transform=val_transform),
-                  val_idx)
-test_ds  = Subset(datasets.ImageFolder(root=data_root, transform=val_transform),
-                  test_idx)
-
-print(f"Split sizes → train: {len(train_ds)}, val: {len(val_ds)}, test: {len(test_ds)}")
-
-# ─────────────────────────────────────────────────────────────
-# 4) DataLoader 생성
-# ─────────────────────────────────────────────────────────────
 loader_kwargs = dict(
     batch_size=16,
-    num_workers=4,
+    num_workers=6,
     pin_memory=True,
     prefetch_factor=2,
     persistent_workers=True
 )
+
 train_loader = DataLoader(train_ds, shuffle=True,  **loader_kwargs)
 val_loader   = DataLoader(val_ds,   shuffle=False, **loader_kwargs)
 test_loader  = DataLoader(test_ds,  shuffle=False, **loader_kwargs)
+
+# # ─────────────────────────────────────────────────────────────
+# # 4) DataLoader 생성
+# # ─────────────────────────────────────────────────────────────
+# loader_kwargs = dict(
+#     batch_size=16,
+#     num_workers=4,
+#     pin_memory=True,
+#     prefetch_factor=2,
+#     persistent_workers=True
+# )
+# train_loader = DataLoader(train_ds, shuffle=True,  **loader_kwargs)
+# val_loader   = DataLoader(val_ds,   shuffle=False, **loader_kwargs)
+# test_loader  = DataLoader(test_ds,  shuffle=False, **loader_kwargs)
 
 # ─────────────────────────────────────────────────────────────
 # 5) 모델 정의 (ResNet50 + custom head)
@@ -147,6 +167,8 @@ metrics = []                          # ← epoch별 메트릭을 담을 리스�
 best_val_loss = float('inf')
 num_epochs    = 50
 print(f"Starting training for {num_epochs} epochs on device={device}")
+no_improve_epochs = 0
+early_stop_patience = 5
 
 for epoch in range(1, num_epochs+1):
     start_time = time.time()
@@ -210,13 +232,21 @@ for epoch in range(1, num_epochs+1):
     # 최적 모델 저장
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-        torch.save(model.state_dict(), 'best_model_from_folder_pre.pth')
+        torch.save(model.state_dict(), '/home/work/workspace_ai/Artificlass/real_use_code/Log/best_model_from_folder_pre_3.pth')
+        no_improve_epochs = 0
         print(f"→ New best model saved (val_loss={best_val_loss:.4f})\n")
+    else:
+        no_improve_epochs += 1
+        print(f"  (no improvement for {no_improve_epochs}/{early_stop_patience} epochs)")
+
+    if no_improve_epochs >= early_stop_patience:
+        print(f"Early stopping triggered after epoch {epoch}")
+        break
 
 # ─────────────────────────────────────────────────────────────
 # 8) JSON 파일로 메트릭 저장
 # ─────────────────────────────────────────────────────────────
-with open('training_metrics.json', 'w') as fp:
+with open('/home/work/workspace_ai/Artificlass/real_use_code/Log/training_metrics_pre_3.json', 'w') as fp:
     json.dump(metrics, fp, indent=2)
 
 print("✅ Metrics saved to training_metrics_pre.json")
